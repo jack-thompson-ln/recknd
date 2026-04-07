@@ -458,14 +458,30 @@ body {
     count++;
     counterEl.textContent = count;
 
-    // In a real deployment, you'd POST to your email service here:
-    // fetch('https://your-email-service/subscribe', {
-    //   method: 'POST',
-    //   headers: { 'Content-Type': 'application/json' },
-    //   body: JSON.stringify({ email })
-    // });
-
-    console.log('Waitlist signup:', email);
+  fetch('https://api.brevo.com/v3/contacts', {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json',
+    'api-key': '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'
+  },
+  body: JSON.stringify({
+    email: email,
+    listIds: [3],
+    updateEnabled: true,
+    attributes: {
+      SOURCE: 'waitlist',
+      SIGNUP_DATE: new Date().toISOString().split('T')[0]
+    }
+  })
+})
+.then(res => {
+  if (res.status === 201 || res.status === 204) {
+    console.log('Signup saved to Brevo:', email);
+  } else {
+    return res.json().then(err => console.error('Brevo error:', err));
+  }
+})
+.catch(err => console.error('Network error:', err));
   }
 
   // Allow Enter key to submit
